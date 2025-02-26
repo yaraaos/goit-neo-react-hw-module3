@@ -1,35 +1,49 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import ContactForm from "./components/ContactForm/ContactForm";
+import SearchBox from "./components/SearchBox/SearchBox";
+import ContactList from "./components/ContactList/ContactList";
+import data from "./data/contacts.json";
+import { nanoid } from "nanoid";
+import css from "./App.module.css";
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [contact, setContact] = useState(
+    () => JSON.parse(localStorage.getItem("contacts")) || data
+  );
+
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleDelete = (id) => {
+    setContact(contact.filter((cont) => cont.id !== id));
+  };
+
+  const handleSearch = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const searchedContacts = contact.filter((cont) =>
+    cont.name.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
+  const handleSubmit = (values, actions) => {
+    const newContact = {
+      id: nanoid(),
+      name: values.name,
+      number: values.number,
+    };
+    setContact([...contact, newContact]);
+    actions.resetForm();
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className={css.container}>
+      <h1>Phonebook</h1>
+      <ContactForm handleSubmit={handleSubmit} />
+      <SearchBox searchValue={searchValue} onSearch={handleSearch} />
+      <ContactList contacts={searchedContacts} onDelete={handleDelete} />
+    </div>
+  );
 }
 
-export default App
+export default App;
