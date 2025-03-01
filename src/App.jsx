@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ContactForm from "./components/ContactForm/ContactForm";
 import SearchBox from "./components/SearchBox/SearchBox";
 import ContactList from "./components/ContactList/ContactList";
@@ -13,6 +13,14 @@ function App() {
   );
 
   const [searchValue, setSearchValue] = useState("");
+
+  useEffect(() => {
+    if (contact.length === 0) {
+      localStorage.removeItem("contacts");
+    } else {
+      localStorage.setItem("contacts", JSON.stringify(contact));
+    }
+  }, [contact]);
 
   const handleDelete = (id) => {
     setContact(contact.filter((cont) => cont.id !== id));
